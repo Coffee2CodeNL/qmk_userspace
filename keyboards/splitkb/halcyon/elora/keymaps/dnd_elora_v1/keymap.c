@@ -278,3 +278,94 @@ tap_dance_action_t tap_dance_actions[] = {
   // Tap once for LMB, twice for RMB
   [TD_MOUSE] = ACTION_TAP_DANCE_DOUBLE(MS_BTN1, MS_BTN2),
 };
+
+#ifdef ENCODER_ENABLE
+bool encoder_update_user(uint8_t index, bool clockwise) {
+  if (index == 0) {
+    // Volume control
+    if (clockwise) {
+      tap_code(MS_WHLD);
+    } else {
+      tap_code(MS_WHLU);
+    }
+  } else if (index == 1) {
+    // Volume control
+    if (clockwise) {
+      tap_code(MS_WHLD);
+    } else {
+      tap_code(MS_WHLU);
+    }
+  } else if (index == 2) {
+    // Page up/Page down
+    if (clockwise) {
+      tap_code(MS_WHLD);
+    } else {
+      tap_code(MS_WHLU);
+    }
+  } else if (index == 3) {
+    // Page up/Page down
+    if (clockwise) {
+      tap_code(MS_WHLD);
+    } else {
+      tap_code(MS_WHLU);
+    }
+  }
+  return false;
+}
+#endif
+
+bool set_scrolling = false;
+
+// Modify these values to adjust the scrolling speed
+#define SCROLL_DIVISOR_H 16.0
+#define SCROLL_DIVISOR_V 16.0
+
+// Variables to store accumulated scroll values
+float scroll_left_accumulated_h = 0;
+float scroll_left_accumulated_v = 0;
+float scroll_right_accumulated_h = 0;
+float scroll_right_accumulated_v = 0;
+
+report_mouse_t pointing_device_task_combined_user(report_mouse_t left_report, report_mouse_t right_report) {
+  // Check if drag scrolling is active
+  if (set_scrolling) {
+    // Calculate and accumulate scroll values based on mouse movement and divisors
+    scroll_left_accumulated_h += (float)left_report.x / SCROLL_DIVISOR_H;
+    scroll_left_accumulated_v += (float)left_report.y / SCROLL_DIVISOR_V;
+    scroll_right_accumulated_h += (float)right_report.x / SCROLL_DIVISOR_H;
+    scroll_right_accumulated_v += (float)right_report.y / SCROLL_DIVISOR_V;
+
+    // Assign integer parts of accumulated scroll values to the mouse report
+    left_report.h = (int8_t)scroll_left_accumulated_h;
+    left_report.v = (int8_t)scroll_left_accumulated_v;
+    right_report.h = (int8_t)scroll_right_accumulated_h;
+    right_report.v = (int8_t)scroll_right_accumulated_v;
+
+    // Update accumulated scroll values by subtracting the integer parts
+    scroll_left_accumulated_h -= (int8_t)scroll_left_accumulated_h;
+    scroll_left_accumulated_v -= (int8_t)scroll_left_accumulated_v;
+    scroll_right_accumulated_h -= (int8_t)scroll_right_accumulated_h;
+    scroll_right_accumulated_v -= (int8_t)scroll_right_accumulated_v;
+
+    // Clear the X and Y values of the mouse report
+    left_report.x = 0;
+    left_report.y = 0;
+    right_report.x = 0;
+    right_report.y = 0;
+  }
+  return pointing_device_combine_reports(left_report, right_report);
+}
+
+layer_state_t layer_state_set_user(layer_state_t state) {
+  switch(get_highest_layer(state)) {
+    case _NAV:
+      set_scrolling = false;
+    break;
+    default:
+      if (!set_scrolling) {
+        set_scrolling = true;
+      }
+    break;
+  }
+  return state;
+}
