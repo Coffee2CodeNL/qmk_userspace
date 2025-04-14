@@ -279,39 +279,16 @@ tap_dance_action_t tap_dance_actions[] = {
   [TD_MOUSE] = ACTION_TAP_DANCE_DOUBLE(MS_BTN1, MS_BTN2),
 };
 
-#ifdef ENCODER_ENABLE
-bool encoder_update_user(uint8_t index, bool clockwise) {
-  if (index == 0) {
-    // Volume control
-    if (clockwise) {
-      tap_code(MS_WHLD);
-    } else {
-      tap_code(MS_WHLU);
-    }
-  } else if (index == 1) {
-    // Volume control
-    if (clockwise) {
-      tap_code(MS_WHLD);
-    } else {
-      tap_code(MS_WHLU);
-    }
-  } else if (index == 2) {
-    // Page up/Page down
-    if (clockwise) {
-      tap_code(MS_WHLD);
-    } else {
-      tap_code(MS_WHLU);
-    }
-  } else if (index == 3) {
-    // Page up/Page down
-    if (clockwise) {
-      tap_code(MS_WHLD);
-    } else {
-      tap_code(MS_WHLU);
-    }
-  }
-  return false;
-}
+#if defined(ENCODER_MAP_ENABLE)
+const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
+  [0] = { ENCODER_CCW_CW(MS_WHLD, MS_WHLU),  ENCODER_CCW_CW(MS_WHLD, MS_WHLU),  ENCODER_CCW_CW(MS_WHLD, MS_WHLU),  ENCODER_CCW_CW(MS_WHLD, MS_WHLU)  },
+  [1] = { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
+  [2] = { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
+  [3] = { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
+  [4] = { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
+  [5] = { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
+  [6] = { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
+};
 #endif
 
 bool set_scrolling = false;
@@ -336,16 +313,16 @@ report_mouse_t pointing_device_task_combined_user(report_mouse_t left_report, re
     scroll_right_accumulated_v += (float)right_report.y / SCROLL_DIVISOR_V;
 
     // Assign integer parts of accumulated scroll values to the mouse report
-    left_report.h = (int8_t)scroll_left_accumulated_h;
-    left_report.v = (int8_t)scroll_left_accumulated_v;
-    right_report.h = (int8_t)scroll_right_accumulated_h;
-    right_report.v = (int8_t)scroll_right_accumulated_v;
+    left_report.h = (int16_t)scroll_left_accumulated_h;
+    left_report.v = (int16_t)scroll_left_accumulated_v;
+    right_report.h = (int16_t)scroll_right_accumulated_h;
+    right_report.v = (int16_t)scroll_right_accumulated_v;
 
     // Update accumulated scroll values by subtracting the integer parts
-    scroll_left_accumulated_h -= (int8_t)scroll_left_accumulated_h;
-    scroll_left_accumulated_v -= (int8_t)scroll_left_accumulated_v;
-    scroll_right_accumulated_h -= (int8_t)scroll_right_accumulated_h;
-    scroll_right_accumulated_v -= (int8_t)scroll_right_accumulated_v;
+    scroll_left_accumulated_h -= (int16_t)scroll_left_accumulated_h;
+    scroll_left_accumulated_v -= (int16_t)scroll_left_accumulated_v;
+    scroll_right_accumulated_h -= (int16_t)scroll_right_accumulated_h;
+    scroll_right_accumulated_v -= (int16_t)scroll_right_accumulated_v;
 
     // Clear the X and Y values of the mouse report
     left_report.x = 0;
@@ -359,11 +336,11 @@ report_mouse_t pointing_device_task_combined_user(report_mouse_t left_report, re
 layer_state_t layer_state_set_user(layer_state_t state) {
   switch(get_highest_layer(state)) {
     case _NAV:
-      set_scrolling = false;
+      set_scrolling = true;
     break;
     default:
-      if (!set_scrolling) {
-        set_scrolling = true;
+      if (set_scrolling) {
+        set_scrolling = false;
       }
     break;
   }

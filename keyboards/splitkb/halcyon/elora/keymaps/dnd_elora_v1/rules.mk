@@ -5,6 +5,7 @@ REPEAT_KEY_ENABLE = yes
 RAW_ENABLE = yes
 MOUSEKEY_ENABLE = yes
 TAP_DANCE_ENABLE = yes
+ENCODER_MAP_ENABLE = yes
 
 SRC += processing.c
 SRC += custom_keys.c
