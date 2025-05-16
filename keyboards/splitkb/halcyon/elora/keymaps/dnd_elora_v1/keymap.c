@@ -42,6 +42,12 @@ enum layers {
 #define HOME_L LALT_T(KC_L)
 #define HOME_SCLN RGUI_T(KC_SCLN)
 
+// Shortcuts I often use
+#define AENTR LALT(KC_ENTER)
+#define AINSR LALT(KC_INS)
+
+int current_matrix_mode = 0;
+
 // Note: LAlt/Enter (ALT_ENT) is not the same thing as the keyboard shortcut Alt+Enter.
 // The notation `mod/tap` denotes a key that activates the modifier `mod` when held down, and
 // produces the key `tap` when tapped (i.e. pressed and released).
@@ -72,7 +78,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
      KC_TAB  ,KC_Q   , KC_W  ,KC_E   ,KC_R   ,KC_T   ,                                KC_Y   ,KC_U   ,KC_I   ,KC_O   ,KC_P     ,KC_BSPC,
      CTL_ESC ,KC_A   , KC_S  ,KC_D   ,KC_F   ,KC_G   ,                                KC_H   ,KC_J   ,KC_K   ,KC_L   ,KC_SCLN  ,CTL_QUOT,
      KC_LSFT ,KC_Z   , KC_X  ,KC_C   ,KC_V   ,KC_B   ,QK_REP ,MOUSE,  FKEYS  ,QK_REP ,KC_N   ,KC_M   ,KC_COMM,KC_DOT ,KC_SLSH  ,KC_RSFT,
-                              ADJUST ,KC_LGUI,ALT_ENT,KC_SPC ,NAV    ,SYM    ,KC_SPC ,KC_RALT,KC_RGUI,KC_APP ,
+                              KC_F13 ,KC_LGUI,ALT_ENT,KC_SPC ,NAV    ,SYM    ,KC_SPC ,KC_RALT,KC_RGUI,KC_F16 ,
      KC_MUTE ,KC_NO  , KC_NO ,KC_NO  ,KC_NO  ,                                                KC_MUTE,KC_NO  ,KC_NO  ,KC_NO    ,KC_NO
     ),
 
@@ -155,8 +161,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
       _______, _______, _______, _______, _______, _______,                                     _______, _______, _______, _______, _______, _______,
       _______, _______, _______, _______, _______, _______,                                     KC_HOME, KC_PGDN, KC_PGUP, KC_END,  _______, KC_DEL,
       _______, KC_LGUI, KC_LALT, KC_LCTL, KC_LSFT, _______,                                     KC_LEFT, KC_DOWN, KC_UP,   KC_RGHT, _______, KC_INS,
-      _______, _______, _______, _______, _______, _______, _______, KC_SCRL, _______, _______, _______, _______, _______, _______, _______, KC_PSCR,
-                                 _______, _______, _______, _______, _______, _______, _______, _______, _______, _______,
+      _______, _______, _______, _______, _______, _______, _______, KC_SCRL, _______, _______, AENTR  , AINSR  , _______, _______, _______, KC_PSCR,
+                                 ADJUST , _______, _______, _______, _______, _______, _______, _______, _______, _______,
       _______, _______, _______, _______, _______,                                                       _______, _______, _______, _______, _______
     ),
 
@@ -238,8 +244,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     [_ADJUST] = LAYOUT_elora_hlc(
       _______, _______, _______, _______, _______, _______,                                    _______, _______, _______, _______, _______, _______,
       _______, _______, _______, QWERTY , _______, _______,                                    _______, _______, _______, _______, _______, _______,
-      _______, _______, _______, GALLIUM, _______, _______,                                    RGB_TOG, RGB_SAI, RGB_HUI, RGB_VAI, RGB_MOD, _______,
-      _______, _______, _______, COLEMAK, _______, _______,_______, _______, _______, _______, _______, RGB_SAD, RGB_HUD, RGB_VAD, RGB_RMOD,_______,
+      _______, _______, _______, GALLIUM, _______, _______,                                    RGB_TOG, RGB_SAI, RGB_HUI, RGB_VAI, RGB_MOD, RGB_SPI,
+      _______, _______, _______, COLEMAK, _______, _______,_______, _______, _______, _______, _______, RGB_SAD, RGB_HUD, RGB_VAD, RGB_RMOD,RGB_SPD,
                                  _______, _______, _______,_______, _______, _______, _______, _______, _______, _______,
       _______, _______, _______, _______, _______,                                                      _______, _______, _______, _______, _______
     ),
@@ -280,14 +286,14 @@ tap_dance_action_t tap_dance_actions[] = {
 };
 
 #if defined(ENCODER_MAP_ENABLE)
-const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
-  [0] = { ENCODER_CCW_CW(MS_WHLD, MS_WHLU),  ENCODER_CCW_CW(MS_WHLD, MS_WHLU),  ENCODER_CCW_CW(MS_WHLD, MS_WHLU),  ENCODER_CCW_CW(MS_WHLD, MS_WHLU)  },
-  [1] = { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
-  [2] = { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
-  [3] = { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
-  [4] = { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
-  [5] = { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
-  [6] = { ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______),  ENCODER_CCW_CW(_______, _______)  },
+const uint16_t PROGMEM encoder_map[][4][NUM_DIRECTIONS] = {
+  [0] = { ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F17, KC_F18),ENCODER_CCW_CW(KC_F17, KC_F18) },
+  [1] = { ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F17, KC_F18),ENCODER_CCW_CW(KC_F17, KC_F18) },
+  [2] = { ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F17, KC_F18),ENCODER_CCW_CW(KC_F17, KC_F18) },
+  [3] = { ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F17, KC_F18),ENCODER_CCW_CW(KC_F17, KC_F18) },
+  [4] = { ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F17, KC_F18),ENCODER_CCW_CW(KC_F17, KC_F18) },
+  [5] = { ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F17, KC_F18),ENCODER_CCW_CW(KC_F17, KC_F18) },
+  [6] = { ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F14, KC_F15),ENCODER_CCW_CW(KC_F17, KC_F18),ENCODER_CCW_CW(KC_F17, KC_F18) },
 };
 #endif
 
@@ -345,4 +351,13 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     break;
   }
   return state;
+}
+
+void suspend_power_down_user(void) {
+    current_matrix_mode = rgb_matrix_get_mode();
+    rgb_matrix_mode_noeeprom(RGB_MATRIX_CYCLE_ALL);
+}
+
+void suspend_wakeup_init_user(void) {
+    rgb_matrix_mode_noeeprom(current_matrix_mode);
 }
